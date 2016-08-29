@@ -1,5 +1,5 @@
 import requests
-import os
+from datetime import datetime
 from urllib.request import urlopen
 from urllib import request
 from urllib.parse import urlsplit
@@ -13,7 +13,10 @@ headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 
 file = open('./pages.txt','w')
 url = "http://jandan.net/ooxx"
+startTime = datetime.now()
 req = session.get(url,headers=headers)
+endTime = datetime.now()
+print("打开页面，用时：",(endTime-startTime))
 bsObj = BeautifulSoup(req.text,"lxml")
 address = bsObj.findAll("a",{"class":"previous-comment-page"})[0]
 imgs = bsObj.findAll("a",{"class":"view_img_link"})
@@ -22,13 +25,17 @@ for x in imgs:
         reqImg = request.Request(x['href'])
         reqImg.add_header("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
         print("正在下载"+x['href'])
+        startTime = datetime.now()
         img_data = urlopen(reqImg).read()
-        print("下载完成")
+        endTime = datetime.now()
+        print("下载完成，用时：",(endTime-startTime))
         file_name = basename(urlsplit(x['href'])[2])
+        startTime = datetime.now()
         output = open('./img/'+file_name,'wb')
         output.write(img_data)
         output.close()
-        print("保存完成")
+        endTime = datetime.now()
+        print("保存完成，用时：",(endTime-startTime))
     except HTTPError as e:
         print(e)
 
@@ -47,13 +54,17 @@ for x in range(5):
             reqImg = request.Request(x['href'])
             reqImg.add_header("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36")
             print("正在下载" + x['href'])
+            startTime = datetime.now()
             img_data = urlopen(reqImg).read()
-            print("下载完成")
+            endTime = datetime.now()
+            print("下载完成，用时：",(endTime-startTime))
+            startTime = datetime.now()
             file_name = basename(urlsplit(x['href'])[2])
             output = open('img/'+file_name,'wb')
             output.write(img_data)
             output.close()
-            print("保存完成")
+            endTime = datetime.now()
+            print("保存完成，用时：",(endTime-startTime))
         except HTTPError as e:
             print(e)
 
