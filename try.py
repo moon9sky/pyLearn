@@ -1,4 +1,5 @@
 import requests
+import gzip
 from datetime import datetime
 from urllib.request import urlopen
 from urllib import request
@@ -9,19 +10,33 @@ from bs4 import BeautifulSoup
 
 headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36",
            "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-           "Cookie":"_gat=1; 711139627=6e16Lomm9yZybx0QbWFXR6kcHvt%2FD17YWg6tvaw4; jdna=596e6fb28c1bb47f949e65e1ae03f7f5#1472131824362; _ga=GA1.2.1849853486.1453643018; Hm_lvt_fd93b7fb546adcfbcf80c4fc2b54da2c=1471761239,1471788385,1471957084,1472131823; Hm_lpvt_fd93b7fb546adcfbcf80c4fc2b54da2c=1472131825"}
+           "Cookie":"__cfduid=d128b406705c93694c4a8a6030b4529b81470453446; CzG_fid19=1472565927; CzG_fid33=1472564697; CzG_fid4=1472489014; __utma=26781301.628974373.1471063336.1471063336.1472564550.2; __utmc=26781301; __utmz=26781301.1471063336.1.1.utmcsr=91porn.com|utmccn=(referral)|utmcmd=referral|utmcct=/v.php; CzG_auth=9fb1Tr7iRduDYbCxpHpFOUsaTUN7K%2BbWSDnPGNgk3k2Yike%2BabqV00nD5jDVR1FB8nECQtHUDl1ETpXDvgtD4qyFzlNl; CzG_sid=VxxPI1; CzG_fid17=1472567012; CzG_oldtopics=D209069D209124D209223D209157D204118D209567D206248D209474D209445D; smile=1D1; checkpm=1; CzG_visitedfid=17D19D33D21; CzG_onlineusernum=4247; AJSTAT_ok_pages=14; AJSTAT_ok_times=2",
+           "Host":"91.t9h.club",
+           "Upgrade-Insecure-Requests":1,
+           "Accept-Language":"zh-CN,zh;q=0.8",
+            }
 
-rootUrl = "http://jandan.net/ooxx"
+rootUrl = "http://91.t9h.club/forumdisplay.php?fid=17"
+
 session = requests.Session()
 
+
+def ungzip(data):
+    try:        # 尝试解压
+        data = gzip.decompress(data)
+    except:
+        print("解压缩错误")
+    return data
 
 def openUrl(url):
     try:
         req = session.get(url,headers=headers)
+        req = ungzip(req)
         webContent = BeautifulSoup(req.text,"lxml")
-        address = webContent.findAll("a",{"class":"previous-comment-page"})[0]
-        imgs = webContent.findAll("a",{"class":"view_img_link"})
-        return address['href'],imgs
+        print(req.text)
+        # address = webContent.findAll("a",{"class":"previous-comment-page"})[0]
+        # imgs = webContent.findAll("a",{"class":"view_img_link"})
+        # return address['href'],imgs
     except HTTPError as e:
         print(e)
 
@@ -43,15 +58,15 @@ def savePic(img,name):
     except Exception as e:
         print(e)
 
-nextUrl,imgs = openUrl(rootUrl)
-for x in imgs:
-    imgName,imgData = downLoadPic(x['href'])
-    savePic(imgData,imgName)
-
-while(nextUrl != ""):
-    nextUrl,imgs = openUrl(nextUrl)
-    for x in imgs:
-        imgName,imgData = downLoadPic(x['href'])
-        savePic(imgData,imgName)
+openUrl(rootUrl)
+# for x in imgs:
+#     imgName,imgData = downLoadPic(x['href'])
+#     savePic(imgData,imgName)
+#
+# while(nextUrl != ""):
+#     nextUrl,imgs = openUrl(nextUrl)
+#     for x in imgs:
+#         imgName,imgData = downLoadPic(x['href'])
+#         savePic(imgData,imgName)
 
 
